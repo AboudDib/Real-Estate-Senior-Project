@@ -27,4 +27,5 @@ const PropertyModel = db.define('PropertyModel', {
   },
 });
 
-module.exports = PropertyModel;
+module.exports = { PropertyModel };
+
