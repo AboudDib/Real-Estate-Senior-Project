@@ -1,40 +1,44 @@
 const { Property } = require('../models/property');
+const { User } = require('../models/user');
 
 // Create Property
-exports.createProperty = async (user_id, name, description, city, price, property_type) => {
+exports.createProperty = async (name, description, city, price, property_type, user_id) => {
   // Check if property with the same name exists for this user
   const existingProperty = await Property.findOne({ where: { name, user_id } });
   if (existingProperty) {
-    throw new Error('Property with this name already exists for this user.');
+    throw new Error('Property with this name already exists for this user');
   }
 
-  // Create new property
-  return await Property.create({ user_id, name, description, city, price, property_type });
-};
-
-// Get Property by ID
-exports.getPropertyById = async (property_id) => {
-  const property = await Property.findByPk(property_id);
-  if (!property) {
-    throw new Error('Property not found');
-  }
-  return property;
-};
-
-// Get All Properties
-exports.getAllProperties = async () => {
-  return await Property.findAll();
+  // Create the property with default values for isApproved and created_at
+  return await Property.create({
+    user_id, 
+    name, 
+    description, 
+    city, 
+    price, 
+    property_type, 
+    isApproved: false,  // Default value for isApproved
+    created_at: new Date()  // Default value for created_at
+  });
 };
 
 // Update Property
-exports.updateProperty = async (property_id, updates) => {
+exports.updateProperty = async (property_id, name, description, city, price, property_type, user_id) => {
   const property = await Property.findByPk(property_id);
   if (!property) {
     throw new Error('Property not found');
   }
 
-  // Update only the fields that are provided in the updates object
-  await property.update(updates);
+  // Update only the fields provided in the request body
+  await property.update({
+    name, 
+    description, 
+    city, 
+    price, 
+    property_type, 
+    user_id
+  });
+
   return property;
 };
 
@@ -46,4 +50,29 @@ exports.deleteProperty = async (property_id) => {
   }
 
   await property.destroy();
+};
+
+// Get Property by ID
+exports.getPropertyById = async (property_id) => {
+  const property = await Property.findByPk(property_id);
+  if (!property) {
+    throw new Error('Property not found');
+  }
+  return property;
+};
+
+// Get Approved Properties
+exports.getApprovedProperties = async () => {
+  return await Property.findAll({
+    where: { isApproved: true },
+    order: [['created_at', 'DESC']]
+  });
+};
+
+// Get Non-Approved Properties
+exports.getNonApprovedProperties = async () => {
+  return await Property.findAll({
+    where: { isApproved: false },
+    order: [['created_at', 'DESC']]
+  });
 };

@@ -34,6 +34,8 @@ exports.registerUser = async (req, res) => {
   }
 
   try {
+    console.log('user Request Body:', req.body);
+   
     const { first_name, last_name, email, password, phone_number } = req.body;
     const user = await userService.registerUser(first_name, last_name, email, password, phone_number);
     res.status(201).json({ message: 'User created successfully', user });

@@ -1,64 +1,73 @@
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 
-// Property validation rules
-exports.createPropertyValidator = [
+// Validator for creating a property
+exports.validateCreateProperty = [
   body('name')
-    .isString()
-    .withMessage('Property name is required and should be a string.')
-    .notEmpty()
-    .withMessage('Property name cannot be empty.'),
+    .notEmpty().withMessage('Name is required')
+    .isString().withMessage('Name must be a string'),
+
   body('description')
-    .isString()
-    .withMessage('Description should be a string.')
-    .notEmpty()
-    .withMessage('Description cannot be empty.'),
+    .notEmpty().withMessage('Description is required')
+    .isString().withMessage('Description must be a string'),
+
   body('city')
-    .isString()
-    .withMessage('City is required and should be a string.')
-    .notEmpty()
-    .withMessage('City cannot be empty.'),
+    .notEmpty().withMessage('City is required')
+    .isString().withMessage('City must be a string'),
+
   body('price')
-    .isDecimal()
-    .withMessage('Price must be a valid decimal.')
-    .notEmpty()
-    .withMessage('Price is required.'),
+    .notEmpty().withMessage('Price is required')
+    .isDecimal().withMessage('Price must be a valid number'),
+
   body('property_type')
-    .isIn(['house', 'apartment', 'land'])
-    .withMessage('Property type must be one of the following: house, apartment, land.')
-    .notEmpty()
-    .withMessage('Property type is required.'),
+    .notEmpty().withMessage('Property type is required')
+    .isIn(['house', 'apartment', 'land']).withMessage('Property type must be one of house, apartment, or land'),
+
+  body('user_id')
+    .notEmpty().withMessage('User ID is required')
+    .isInt().withMessage('User ID must be an integer'),
 ];
 
-// Update Property validation rules
-exports.updatePropertyValidator = [
+// Validator for getting a property by ID
+exports.validateGetPropertyById = [
+  param('property_id')
+    .notEmpty().withMessage('Property ID is required')
+    .isInt().withMessage('Property ID must be an integer'),
+];
+
+// Validator for updating a property
+exports.validateUpdateProperty = [
+  param('property_id')
+    .notEmpty().withMessage('Property ID is required')
+    .isInt().withMessage('Property ID must be an integer'),
+
   body('name')
     .optional()
-    .isString()
-    .withMessage('Property name should be a string.')
-    .notEmpty()
-    .withMessage('Property name cannot be empty.'),
+    .isString().withMessage('Name must be a string'),
+
   body('description')
     .optional()
-    .isString()
-    .withMessage('Description should be a string.')
-    .notEmpty()
-    .withMessage('Description cannot be empty.'),
+    .isString().withMessage('Description must be a string'),
+
   body('city')
     .optional()
-    .isString()
-    .withMessage('City should be a string.')
-    .notEmpty()
-    .withMessage('City cannot be empty.'),
+    .isString().withMessage('City must be a string'),
+
   body('price')
     .optional()
-    .isDecimal()
-    .withMessage('Price must be a valid decimal.')
-    .notEmpty()
-    .withMessage('Price is required.'),
+    .isDecimal().withMessage('Price must be a valid number'),
+
   body('property_type')
     .optional()
-    .isIn(['house', 'apartment', 'land'])
-    .withMessage('Property type must be one of the following: house, apartment, land.')
-    .notEmpty()
-    .withMessage('Property type is required.'),
+    .isIn(['house', 'apartment', 'land']).withMessage('Property type must be one of house, apartment, or land'),
+  
+  body('user_id')
+    .optional()
+    .isInt().withMessage('User ID must be an integer'),
+];
+
+// Validator for deleting a property
+exports.validateDeleteProperty = [
+  param('property_id')
+    .notEmpty().withMessage('Property ID is required')
+    .isInt().withMessage('Property ID must be an integer'),
 ];

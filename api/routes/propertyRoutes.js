@@ -1,25 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const propertyController = require('../controllers/propertyController'); // Ensure correct import
+const propertyController = require('../controllers/propertyController'); 
 const propertyValidator = require('../validators/propertyValidator'); 
 const { validate } = require('../middlewares/validationMiddleware');
-// Routes for Property
+
+// Create Property
 router.post(
   '/create',
-  propertyValidator.createPropertyValidator,
-  validate,  // Assuming you have a middleware that runs validation results
-  propertyController.createProperty
+  propertyValidator.validateCreateProperty,  // Validator for property creation
+  validate,  // Custom validation middleware to handle validation errors
+  propertyController.createProperty  // Controller to handle the actual creation logic
 );
 
+// Update Property
 router.put(
   '/update/:property_id',
-  propertyValidator.updatePropertyValidator,
-  validate, 
-  propertyController.updateProperty
+  propertyValidator.validateUpdateProperty,  // Validator for property update
+  validate,  // Custom validation middleware to handle validation errors
+  propertyController.updateProperty  // Controller to handle the actual update logic
 );
 
-router.delete('/delete/:property_id', propertyController.deleteProperty);
+// Delete Property
+router.delete('/delete/:property_id', 
+  propertyValidator.validateDeleteProperty,  // Validator for deleting property
+  validate,  // Custom validation middleware to handle validation errors
+  propertyController.deleteProperty  // Controller to delete the property
+);
 
-router.get('/get/:property_id', propertyController.getPropertyById);
+// Get Property by ID
+router.get('/get/:property_id',
+  propertyValidator.validateGetPropertyById,  // Validator for fetching property by ID
+  validate,  // Custom validation middleware to handle validation errors
+  propertyController.getPropertyById  // Controller to fetch property by ID
+);
+
+// Get Approved Properties
+router.get('/approved', propertyController.getApprovedProperties);
+
+// Get Non-Approved Properties
+router.get('/non-approved', propertyController.getNonApprovedProperties);
 
 module.exports = router;

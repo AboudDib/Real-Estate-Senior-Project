@@ -36,6 +36,10 @@ const Property = sequelize.define("Property", {
     type: DataTypes.ENUM('house', 'apartment', 'land'),
     allowNull: false,
   },
+  isApproved: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false, // Default to false, requiring approval
+  },
   created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
