@@ -76,3 +76,52 @@ exports.getNonApprovedProperties = async () => {
     order: [['created_at', 'DESC']]
   });
 };
+
+// Get Land Properties
+exports.getLandProperties = async () => {
+  return await Property.findAll({
+    where: { property_type: 'land' },
+    order: [['created_at', 'DESC']]
+  });
+};
+
+// Get House Properties
+exports.getHouseProperties = async () => {
+  return await Property.findAll({
+    where: { property_type: 'house' },
+    order: [['created_at', 'DESC']]
+  });
+};
+
+// Approve Property
+exports.approveProperty = async (property_id) => {
+  // Find the property by ID
+  const property = await Property.findByPk(property_id);
+  if (!property) {
+    throw new Error('Property not found');
+  }
+
+  // Change isApproved to true
+  property.isApproved = true;
+  await property.save();
+
+  return property;
+};
+
+
+exports.getPropertiesByLocation = async (propertyType, city) => {
+  try {
+    // Query the properties by type and location (city)
+    const properties = await Property.findAll({
+      where: {
+        property_type: propertyType,
+        city: city,
+      },
+    });
+
+    return properties;
+  } catch (error) {
+    console.error('Error fetching properties by location:', error);
+    throw new Error('Error fetching properties by location');
+  }
+};

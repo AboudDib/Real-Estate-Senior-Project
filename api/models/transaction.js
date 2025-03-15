@@ -47,9 +47,9 @@ const Transaction = sequelize.define("Transaction", {
 });
 
 // Associations
-Transaction.belongsTo(User, { foreignKey: 'buyer_user_id', as: 'buyer' });
-Transaction.belongsTo(User, { foreignKey: 'seller_user_id', as: 'seller' });
-Transaction.belongsTo(Property, { foreignKey: 'property_id' });
+Transaction.belongsTo(User, { foreignKey: 'buyer_user_id', as: 'buyer' , onDelete: 'CASCADE' });
+Transaction.belongsTo(User, { foreignKey: 'seller_user_id', as: 'seller', onDelete: 'CASCADE'  });
+Transaction.belongsTo(Property, { foreignKey: 'property_id', onDelete: 'CASCADE'  });
 
 User.hasMany(Transaction, { foreignKey: 'buyer_user_id', as: 'buyerTransactions' });
 User.hasMany(Transaction, { foreignKey: 'seller_user_id', as: 'sellerTransactions' });

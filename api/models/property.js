@@ -33,8 +33,20 @@ const Property = sequelize.define("Property", {
     allowNull: false,
   },
   property_type: {
-    type: DataTypes.ENUM('house', 'apartment', 'land'),
+    type: DataTypes.ENUM('house', 'land'),  // Removed apartment and kept only house and land
     allowNull: false,
+  },
+  square_meter: {
+    type: DataTypes.INTEGER,
+    allowNull: true,  // Can be null for non-house properties (like land)
+    validate: {
+      isNumeric: true,  // Ensures the value is numeric if filled
+    },
+  },
+  isForRent: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,  // Can be null for non-house properties
+    defaultValue: false,  // Default to false (not for rent) for properties other than house
   },
   isApproved: {
     type: DataTypes.BOOLEAN,
@@ -49,7 +61,7 @@ const Property = sequelize.define("Property", {
 });
 
 // Define associations
-Property.belongsTo(User, { foreignKey: 'user_id' });
+Property.belongsTo(User, { foreignKey: 'user_id' , onDelete: 'CASCADE'});
 User.hasMany(Property, { foreignKey: 'user_id' });
 
 module.exports = { Property };

@@ -26,6 +26,7 @@ const PropertyModel = db.define('PropertyModel', {
     allowNull: false,
   },
 });
+PropertyModel.belongsTo(Property, { foreignKey: 'property_id' , onDelete: 'CASCADE' });
 
 module.exports = { PropertyModel };
 

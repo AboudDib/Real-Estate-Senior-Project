@@ -28,6 +28,9 @@ app.use('/api/property', propertyRoutes);
 
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api/transactions', transactionRoutes);
+// Add PropertyModel route here
+const propertyImageRoutes = require('./routes/propertyImageRoutes');  // Import the property model routes
+app.use('/api/property-images', propertyImageRoutes);  // Add the route for property models
 
 // Add PropertyModel route here
 const propertyModelRoutes = require('./routes/propertyModelRoutes');  // Import the property model routes

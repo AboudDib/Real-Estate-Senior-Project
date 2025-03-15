@@ -25,7 +25,7 @@ const PropertyImage = sequelize.define("PropertyImage", {
 });
 
 // Define associations
-PropertyImage.belongsTo(Property, { foreignKey: 'property_id' });
+PropertyImage.belongsTo(Property, { foreignKey: 'property_id' , onDelete: 'CASCADE' });
 Property.hasMany(PropertyImage, { foreignKey: 'property_id' });
 
 module.exports = { PropertyImage };
