@@ -18,6 +18,7 @@ exports.getImagesByProperty = async (propertyId) => {
   try {
     const images = await PropertyImage.findAll({
       where: { property_id: propertyId },
+      order: [['image_id', 'ASC']], // Order by image_id in ascending order
     });
     return images;
   } catch (error) {

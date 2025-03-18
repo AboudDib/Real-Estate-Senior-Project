@@ -39,6 +39,9 @@ router.get('/get/:property_id',
   propertyController.getPropertyById
 );
 
+router.get('/properties/user/:user_id',
+   propertyController.getPropertiesByUserId);
+
 // Get Approved Properties
 router.get('/approved', 
   authToken,  // Add the authToken middleware here
@@ -85,6 +88,7 @@ router.get('/location/house',
 router.get('/location/land',
   propertyValidator.validateGetPropertiesByLocation, 
    propertyController.getLandPropertiesByLocation);
+
 
 
 module.exports = router;

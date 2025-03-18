@@ -1,4 +1,5 @@
 const { User } = require('../models/user');
+const { Op } = require("sequelize");
 const bcrypt = require('bcryptjs');
 
 // Authenticate User (Login)
@@ -18,24 +19,38 @@ exports.authenticateUser = async (email, password) => {
 
 // Register User
 exports.registerUser = async (first_name, last_name, email, password, phone_number) => {
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      throw new Error('User already exists');
-    }
-  
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-  
-    const user = await User.create({
-      first_name,   // Correct attribute: first_name
-      last_name,    // Correct attribute: last_name
-      email,        // Correct attribute: email
+  // Check if user already exists by email or phone number
+  const existingUser = await User.findOne({ 
+      where: { 
+          [Op.or]: [{ email }, { phone_number }] 
+      } 
+  });
+
+  if (existingUser) {
+      if (existingUser.email === email) {
+          throw new Error('User with this email already exists');
+      }
+      if (existingUser.phone_number === phone_number) {
+          throw new Error('User with this phone number already exists');
+      }
+  }
+
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Create new user
+  const user = await User.create({
+      first_name,
+      last_name,
+      email,
       password: hashedPassword,
-      phone_number, // Correct attribute: phone_number
-    });
-  
-    return user;
+      phone_number,
+  });
+
+  return user;
 };
+
 
 // Update User
 exports.updateUser = async (userId, first_name, last_name, email, password, phone_number) => {

@@ -125,3 +125,19 @@ exports.getPropertiesByLocation = async (propertyType, city) => {
     throw new Error('Error fetching properties by location');
   }
 };
+
+// Get Properties by User ID
+exports.getPropertiesByUserId = async (user_id) => {
+  try {
+    // Find properties associated with a particular user
+    const properties = await Property.findAll({
+      where: { user_id },
+      order: [['created_at', 'DESC']],
+    });
+
+    return properties;
+  } catch (error) {
+    console.error('Error fetching properties by user ID:', error);
+    throw new Error('Error fetching properties by user ID');
+  }
+};

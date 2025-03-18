@@ -234,3 +234,22 @@ exports.getLandPropertiesByLocation = async (req, res) => {
     });
   }
 };
+
+// Get Properties by User ID
+exports.getPropertiesByUserId = async (req, res) => {
+  try {
+    const { user_id } = req.params;  // Get user_id from URL params
+
+    // Call the service method to get properties by user_id
+    const properties = await propertyService.getPropertiesByUserId(user_id);
+
+    if (!properties || properties.length === 0) {
+      return res.status(404).json({ message: 'No properties found for this user' });
+    }
+
+    res.status(200).json({ properties });
+  } catch (error) {
+    res.status(400).json({ message: 'Error fetching properties by user ID', error: error.message });
+  }
+};
+
