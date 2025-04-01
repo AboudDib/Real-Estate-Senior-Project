@@ -19,6 +19,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
+// Use the machine learning route
+const machineLearningRoutes = require('./routes/mlRoutes');  // Adjust the path if necessary
+app.use('/api/ml', machineLearningRoutes);
+
 // Routes setup
 const userRoutes = require("./routes/userRoutes");
 app.use("/api/users", userRoutes);

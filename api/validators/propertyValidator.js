@@ -20,7 +20,7 @@ exports.validateCreateProperty = [
 
   body('property_type')
     .notEmpty().withMessage('Property type is required')
-    .isIn(['house', 'land']).withMessage('Property type must be one of house or land'), // Removed apartment type
+    .isIn(['house', 'apartment', 'villa']).withMessage('Property type must be one of house, apartment, or villa'),
 
   body('user_id')
     .notEmpty().withMessage('User ID is required')
@@ -35,7 +35,7 @@ exports.validateCreateProperty = [
   body('isForRent')
     .if(body('property_type').equals('house'))
     .isBoolean().withMessage('For Rent flag must be a boolean')
-    .optional() // Allows isForRent to be optional, but it must be boolean if provided
+    .optional(), // Allows isForRent to be optional, but it must be boolean if provided
 ];
 
 // Validator for getting a property by ID
@@ -69,7 +69,7 @@ exports.validateUpdateProperty = [
 
   body('property_type')
     .optional()
-    .isIn(['house', 'land']).withMessage('Property type must be one of house or land'), // Removed apartment type
+    .isIn(['house', 'apartment', 'villa']).withMessage('Property type must be one of house, apartment, or villa'),
 
   body('user_id')
     .optional()
@@ -84,7 +84,7 @@ exports.validateUpdateProperty = [
   body('isForRent')
     .if(body('property_type').equals('house'))
     .isBoolean().withMessage('For Rent flag must be a boolean')
-    .optional() // Allows isForRent to be optional, but it must be boolean if provided
+    .optional(),
 ];
 
 // Validator for deleting a property
@@ -96,8 +96,31 @@ exports.validateDeleteProperty = [
 
 exports.validateGetPropertiesByLocation = [
   body('city')
-    .notEmpty().withMessage('City is required')  // Check if city is provided
-    .isString().withMessage('City must be a string')  // Ensure it's a string
-    .trim()  // Remove leading/trailing spaces
-    .isLength({ min: 3 }).withMessage('City must be at least 3 characters long'),  // Minimum length of 3 characters
+    .notEmpty().withMessage('City is required')
+    .isString().withMessage('City must be a string')
+    .trim()
+    .isLength({ min: 3 }).withMessage('City must be at least 3 characters long'),
+];
+
+// Validator for getting properties dynamically (sorting, filtering by city, property type)
+exports.validateGetPropertiesDynamic = [
+  body('isRent')
+    .isBoolean().withMessage('isRent should be a boolean value')
+    .optional({ checkFalsy: true }),
+
+  body('sortBy')
+    .isIn(['price_asc', 'price_desc', 'date_asc', 'date_desc'])
+    .withMessage('sortBy must be one of price_asc, price_desc, date_asc, or date_desc')
+    .optional({ checkFalsy: true }),
+
+  body('city')
+    .optional()
+    .isString().withMessage('City must be a string')
+    .trim()
+    .isLength({ min: 3 }).withMessage('City must be at least 3 characters long'),
+
+  body('propertyType')
+    .optional()
+    .isIn(['villa', 'apartment'])
+    .withMessage('propertyType must be one of Villa or Apartment'),
 ];

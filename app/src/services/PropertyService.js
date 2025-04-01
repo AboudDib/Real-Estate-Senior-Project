@@ -1,21 +1,35 @@
-// services/propertyService.js
 import http from "../http-common";
-import handleApiError from "../utils/apiErrorHandler";  // Import the reusable error handler
+import handleApiError from "../utils/apiErrorHandler";  // Reusable error handler
+
+// Function to get the token
+const getToken = () => {
+  return localStorage.getItem("token");  // Assuming token is stored in localStorage
+};
 
 // Create Property
 const createProperty = async (propertyData) => {
   try {
-    const response = await http.post("/properties/create", propertyData);
+    const token = getToken();
+    const response = await http.post("/property/create", propertyData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
-    return handleApiError(error);  
+    return handleApiError(error);
   }
 };
 
 // Update Property
 const updateProperty = async (propertyId, propertyData) => {
   try {
-    const response = await http.put(`/properties/update/${propertyId}`, propertyData);
+    const token = getToken();
+    const response = await http.put(`/property/update/${propertyId}`, propertyData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
@@ -25,7 +39,12 @@ const updateProperty = async (propertyId, propertyData) => {
 // Delete Property
 const deleteProperty = async (propertyId) => {
   try {
-    const response = await http.delete(`/properties/delete/${propertyId}`);
+    const token = getToken();
+    const response = await http.delete(`/property/delete/${propertyId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
@@ -35,7 +54,12 @@ const deleteProperty = async (propertyId) => {
 // Get Property by ID
 const getPropertyById = async (propertyId) => {
   try {
-    const response = await http.get(`/properties/get/${propertyId}`);
+    const token = getToken();
+    const response = await http.get(`/property/get/${propertyId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
@@ -45,7 +69,12 @@ const getPropertyById = async (propertyId) => {
 // Get Properties by User ID
 const getPropertiesByUserId = async (userId) => {
   try {
-    const response = await http.get(`/properties/user/${userId}`);
+    const token = getToken();
+    const response = await http.get(`/property/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
@@ -55,7 +84,12 @@ const getPropertiesByUserId = async (userId) => {
 // Get Approved Properties
 const getApprovedProperties = async () => {
   try {
-    const response = await http.get("/properties/approved");
+    const token = getToken();
+    const response = await http.get("/property/approved", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
@@ -65,7 +99,12 @@ const getApprovedProperties = async () => {
 // Get Non-Approved Properties
 const getNonApprovedProperties = async () => {
   try {
-    const response = await http.get("/properties/non-approved");
+    const token = getToken();
+    const response = await http.get("/property/non-approved", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
@@ -75,62 +114,71 @@ const getNonApprovedProperties = async () => {
 // Approve Property
 const approveProperty = async (propertyId) => {
   try {
-    const response = await http.put(`/properties/approve/${propertyId}`);
+    const token = getToken();
+    const response = await http.put(`/property/approve/${propertyId}`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
   }
 };
 
-// Get Land Properties
-const getLandProperties = async () => {
+// Get Properties by Type (apartments, villas)
+const getPropertiesByType = async (propertyType) => {
   try {
-    const response = await http.get("/properties/land");
+    const token = getToken();
+    const response = await http.get(`/property/type/${propertyType}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
   }
 };
 
-// Get House Properties
-const getHouseProperties = async () => {
+// Get Properties by Location (filtered by type and city)
+const getPropertiesByLocation = async (propertyType, city) => {
   try {
-    const response = await http.get("/properties/house");
+    const token = getToken();
+    const response = await http.get("/property/location", {
+      params: { propertyType, city },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     return handleApiError(error);
   }
 };
 
-// Get Properties by Location
-const getPropertiesByLocation = async (locationData) => {
+const getPropertiesDynamic = async ({ isRent, sortBy, city, propertyType }) => {
   try {
-    const response = await http.get("/properties/location", { params: locationData });
-    return response;
+    const token = getToken();
+    console.log("Token:", token);  // Debugging token
+
+    const response = await http.post("/property/dynamic", {
+      isRent,
+      sortBy,
+      city,
+      propertyType,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in headers
+      },
+    });
+
+    return response.data;  // Return only the data part of the response
   } catch (error) {
     return handleApiError(error);
   }
 };
 
-// Get House Properties by Location
-const getHousePropertiesByLocation = async (locationData) => {
-  try {
-    const response = await http.get("/properties/location/house", { params: locationData });
-    return response;
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-// Get Land Properties by Location
-const getLandPropertiesByLocation = async (locationData) => {
-  try {
-    const response = await http.get("/properties/location/land", { params: locationData });
-    return response;
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
 
 // Export the service methods
 const PropertyService = {
@@ -142,11 +190,10 @@ const PropertyService = {
   getApprovedProperties,
   getNonApprovedProperties,
   approveProperty,
-  getLandProperties,
-  getHouseProperties,
+  getPropertiesByType,
   getPropertiesByLocation,
-  getHousePropertiesByLocation,
-  getLandPropertiesByLocation,
+  getPropertiesDynamic,
 };
 
 export default PropertyService;
+``

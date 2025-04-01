@@ -15,10 +15,12 @@
     "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",
     "axios": "^1.8.3",
+    "lucide-react": "^0.486.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0",
-    "react-scroll": "^1.9.3"
+    "react-scroll": "^1.9.3",
+    "styled-components": "^6.1.16"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

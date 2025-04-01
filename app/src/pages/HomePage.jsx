@@ -81,7 +81,7 @@ const HomePage = () => {
               }}
             >
               <img
-                src="https://i.ibb.co/MDfWbKxp/white-LRE-logo.png"
+                src={`${imageLinks.WhiteLRELogo}`}
                 alt="Logo"
                 style={{ width: "80px", height: "auto" }}
               />

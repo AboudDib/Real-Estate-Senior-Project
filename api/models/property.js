@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/dbconfig");
-const { User } = require("./user");  // Destructure to access User model
+const { User } = require("./user"); // Importing User model
 
 const Property = sequelize.define("Property", {
   property_id: {
@@ -13,7 +13,7 @@ const Property = sequelize.define("Property", {
     allowNull: false,
     references: {
       model: User,
-      key: 'user_id', // Foreign key references the primary key of User model
+      key: "user_id", // Foreign key references User model
     },
   },
   name: {
@@ -21,7 +21,7 @@ const Property = sequelize.define("Property", {
     allowNull: false,
   },
   description: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT, // Changed to TEXT for longer descriptions
     allowNull: false,
   },
   city: {
@@ -33,20 +33,58 @@ const Property = sequelize.define("Property", {
     allowNull: false,
   },
   property_type: {
-    type: DataTypes.ENUM('house', 'land'),  // Removed apartment and kept only house and land
+    type: DataTypes.ENUM("apartment", "villa"), // Replaced 'house' and 'land' with 'apartment' and 'villa'
     allowNull: false,
   },
   square_meter: {
     type: DataTypes.INTEGER,
-    allowNull: true,  // Can be null for non-house properties (like land)
+    allowNull: false,
     validate: {
-      isNumeric: true,  // Ensures the value is numeric if filled
+      isNumeric: true,
+    },
+  },
+  bedrooms: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 0,
+    },
+  },
+  bathrooms: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 0,
+    },
+  },
+  living_rooms: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 1, // Most properties have at least one living room
+    validate: {
+      min: 0,
+    },
+  },
+  balconies: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0, // Some properties might not have balconies
+    validate: {
+      min: 0,
+    },
+  },
+  parking_spaces: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0, // Some properties might not have parking
+    validate: {
+      min: 0,
     },
   },
   isForRent: {
     type: DataTypes.BOOLEAN,
-    allowNull: true,  // Can be null for non-house properties
-    defaultValue: false,  // Default to false (not for rent) for properties other than house
+    allowNull: false,
+    defaultValue: false,
   },
   isApproved: {
     type: DataTypes.BOOLEAN,
@@ -61,7 +99,7 @@ const Property = sequelize.define("Property", {
 });
 
 // Define associations
-Property.belongsTo(User, { foreignKey: 'user_id' , onDelete: 'CASCADE'});
-User.hasMany(Property, { foreignKey: 'user_id' });
+Property.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" });
+User.hasMany(Property, { foreignKey: "user_id" });
 
 module.exports = { Property };

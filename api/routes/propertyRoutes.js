@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const propertyController = require('../controllers/propertyController'); 
-const propertyValidator = require('../validators/propertyValidator'); 
+const propertyController = require('../controllers/propertyController');
+const propertyValidator = require('../validators/propertyValidator');
 const { validate } = require('../middlewares/validationMiddleware');
-const authToken = require('../middlewares/authToken');  // Import the authToken middleware
+const authToken = require('../middlewares/authToken');
 
 // Create Property
 router.post(
   '/create',
-  authToken,  // Add the authToken middleware here to ensure only authenticated users can create properties
-  propertyValidator.validateCreateProperty, 
+  authToken,
+  propertyValidator.validateCreateProperty,
   validate,
   propertyController.createProperty
 );
@@ -17,78 +17,86 @@ router.post(
 // Update Property
 router.put(
   '/update/:property_id',
-  authToken,  // Add the authToken middleware here
-  propertyValidator.validateUpdateProperty, 
+  authToken,
+  propertyValidator.validateUpdateProperty,
   validate,
   propertyController.updateProperty
 );
 
 // Delete Property
-router.delete('/delete/:property_id', 
-  authToken,  // Add the authToken middleware here
-  propertyValidator.validateDeleteProperty, 
-  validate, 
+router.delete(
+  '/delete/:property_id',
+  authToken,
+  propertyValidator.validateDeleteProperty,
+  validate,
   propertyController.deleteProperty
 );
 
 // Get Property by ID
-router.get('/get/:property_id',
-  authToken,  // Add the authToken middleware here
-  propertyValidator.validateGetPropertyById, 
-  validate, 
+router.get(
+  '/get/:property_id',
+  authToken,
+  propertyValidator.validateGetPropertyById,
+  validate,
   propertyController.getPropertyById
 );
 
-router.get('/properties/user/:user_id',
-   propertyController.getPropertiesByUserId);
+// Get Properties by User ID
+router.get(
+  '/user/:user_id',
+  authToken,
+  validate,
+  propertyController.getPropertiesByUserId
+);
 
 // Get Approved Properties
-router.get('/approved', 
-  authToken,  // Add the authToken middleware here
+router.get(
+  '/approved',
+  authToken,
+  validate,
   propertyController.getApprovedProperties
 );
 
 // Get Non-Approved Properties
-router.get('/non-approved', 
-  authToken,  // Add the authToken middleware here
+router.get(
+  '/non-approved',
+  authToken,
+  validate,
   propertyController.getNonApprovedProperties
 );
 
 // Approve Property
 router.put(
   '/approve/:property_id',
-  authToken,  // Ensure user is authenticated
-  propertyController.approveProperty  // Call the controller function for approving property
+  authToken,
+  validate,
+  propertyController.approveProperty
 );
 
-
-// Get Land Properties
-router.get('/land', 
-  authToken,  // Ensure user is authenticated
-  propertyController.getLandProperties
+// Get Properties by Type (apartments, villas)
+router.get(
+  '/type/:propertyType',
+  authToken,
+  validate,
+  propertyController.getPropertiesByType
 );
 
-// Get House Properties
-router.get('/house', 
-  authToken,  // Ensure user is authenticated
-  propertyController.getHouseProperties
-);
-
-// In propertyRoutes.js
-router.get('/location', 
-  propertyValidator.validateGetPropertiesByLocation, 
-  propertyController.getPropertiesByLocation);
-
-  // Route for house properties
-router.get('/location/house',
+// Get Properties by Location
+router.get(
+  '/location',
   propertyValidator.validateGetPropertiesByLocation,
-    propertyController.getHousePropertiesByLocation);
+  authToken,
+  validate,
+  propertyController.getPropertiesByLocation
+);
 
-// Route for land properties
-router.get('/location/land',
-  propertyValidator.validateGetPropertiesByLocation, 
-   propertyController.getLandPropertiesByLocation);
-
-
+// Get Properties Dynamically (sorting, filtering by city and property type)
+router.post(
+  '/dynamic',
+  propertyValidator.validateGetPropertiesDynamic,  // Validator for dynamic properties
+  authToken,
+  validate,  // Middleware for handling validation errors
+  propertyController.getPropertiesDynamic  // Controller function to get properties
+);
 
 module.exports = router;
