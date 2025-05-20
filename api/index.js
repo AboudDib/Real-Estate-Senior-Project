@@ -7,9 +7,9 @@ const sequelize = require("./config/dbconfig");  // Sequelize DB configuration
 // Import models
 const { User } = require("./models/user");
 const { Property } = require("./models/property");
-const { Transaction } = require("./models/transaction");
 const { PropertyImage } = require("./models/propertyImage");  // Correct model name
 const { PropertyModel } = require("./models/propertyModel"); // Import PropertyModel
+
 
 const app = express();
 const port = process.env.PORT || 3001;  // Default to port 3001 if not provided in .env
@@ -30,8 +30,6 @@ app.use("/api/users", userRoutes);
 const propertyRoutes = require('./routes/propertyRoutes');
 app.use('/api/property', propertyRoutes);
 
-const transactionRoutes = require('./routes/transactionRoutes');
-app.use('/api/transactions', transactionRoutes);
 // Add PropertyModel route here
 const propertyImageRoutes = require('./routes/propertyImageRoutes');  // Import the property model routes
 app.use('/api/property-images', propertyImageRoutes);  // Add the route for property models
@@ -39,6 +37,11 @@ app.use('/api/property-images', propertyImageRoutes);  // Add the route for prop
 // Add PropertyModel route here
 const propertyModelRoutes = require('./routes/propertyModelRoutes');  // Import the property model routes
 app.use('/api/property-model', propertyModelRoutes);  // Add the route for property models
+
+// Add PropertyModel route here
+const resendRoutes = require('./routes/resendRoutes');  // Import the property model routes
+app.use('/api/resend', resendRoutes);  // Add the route for property models
+
 
 // Database Sync
 sequelize

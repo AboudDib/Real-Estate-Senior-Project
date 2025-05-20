@@ -1,3 +1,40 @@
+/**
+ * propertyController.js
+ *
+ * This controller handles all property-related HTTP operations for the real estate web application.
+ * It provides endpoints for creating, updating, deleting, retrieving, and approving property listings.
+ * Each function delegates business logic to the `propertyService` and interacts with the database via models.
+ *
+ * Key Features:
+ * - Create, update, and delete properties
+ * - Fetch properties by various criteria: ID, type, location, user ID, approval status
+ * - Dynamically filter properties based on rent/sale, price range, city, year, and other attributes
+ * - Approve property listings (admin only)
+ *
+ * Methods:
+ * - createProperty(req, res): Adds a new property to the database after verifying the user.
+ * - updateProperty(req, res): Updates an existing property with new details.
+ * - deleteProperty(req, res): Deletes a property by ID.
+ * - getPropertyById(req, res): Fetches a property by its ID.
+ * - getApprovedProperties(req, res): Retrieves all properties that have been approved.
+ * - getNonApprovedProperties(req, res): Retrieves all properties awaiting admin approval.
+ * - getPropertiesDynamic(req, res): Advanced filter-based search for properties (price, type, city, etc.).
+ * - getPropertiesByType(req, res): Fetches properties filtered by type (apartment, villa).
+ * - getPropertiesByLocation(req, res): Fetches properties by city and type.
+ * - getPropertiesByUserId(req, res): Fetches properties added by a specific user.
+ * - approveProperty(req, res): Allows an admin to approve a property listing.
+ *
+ * Dependencies:
+ * - propertyService: Contains business logic for interacting with the property model and database.
+ * - User model: Used for user validation and admin checks.
+ *
+ * Notes:
+ * - Includes validation for user existence and admin authorization.
+ * - Handles errors with appropriate status codes and messages.
+ * - Supports new fields like `furnished` and `year_built` for better property listings.
+ */
+
+
 const propertyService = require('../services/propertyService');
 const { User } = require('../models/user');
 
@@ -7,20 +44,20 @@ exports.createProperty = async (req, res) => {
     const { 
       name, description, city, price, property_type, 
       bedrooms, bathrooms, living_rooms, balconies, 
-      parking_spaces, square_meter, user_id, isForRent 
+      parking_spaces, square_meter, user_id, isForRent,
+      year_built, furnished // ✅ New fields
     } = req.body;
-
-    // Check if user exists
+    console.log(req.body)
     const user = await User.findByPk(user_id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Create property and pass isForRent
     const newProperty = await propertyService.createProperty(
       name, description, city, price, property_type, 
       bedrooms, bathrooms, living_rooms, balconies, 
-      parking_spaces, square_meter, user_id, isForRent
+      parking_spaces, square_meter, user_id, isForRent,
+      furnished, year_built // ✅ New fields
     );
 
     res.status(201).json({ message: 'Property created successfully', property: newProperty });
@@ -34,14 +71,23 @@ exports.createProperty = async (req, res) => {
 exports.updateProperty = async (req, res) => {
   try {
     const { property_id } = req.params;
-    const { name, description, city, price, property_type, bedrooms, bathrooms, living_rooms, balconies, parking_spaces } = req.body;
+    const { 
+      name, description, city, price, property_type, 
+      bedrooms, bathrooms, living_rooms, balconies, 
+      parking_spaces, year_built, furnished // ✅ Added
+    } = req.body;
 
-    const updatedProperty = await propertyService.updateProperty(property_id, name, description, city, price, property_type, bedrooms, bathrooms, living_rooms, balconies, parking_spaces);
+    const updatedProperty = await propertyService.updateProperty(
+      property_id, name, description, city, price, 
+      property_type, bedrooms, bathrooms, living_rooms, 
+      balconies, parking_spaces, year_built, furnished // ✅ Pass to service
+    );
     res.status(200).json({ message: 'Property updated successfully', property: updatedProperty });
   } catch (error) {
     res.status(400).json({ message: 'Error updating property', error: error.message });
   }
 };
+
 
 // Delete Property
 exports.deleteProperty = async (req, res) => {
@@ -75,22 +121,28 @@ exports.getApprovedProperties = async (req, res) => {
   }
 };
 
-// Controller
+// ✅ Update Get Properties Dynamic with new fields including userId
 exports.getPropertiesDynamic = async (req, res) => {
   try {
-    const { isRent, sortBy, city, propertyType } = req.body; // Get parameters from the request body
-    console.log(req.body)
-    // Call the service function to get properties
-    const properties = await propertyService.getPropertiesDynamic(isRent, sortBy, city, propertyType);
-    
-    // Return the response with the fetched properties
+    const { 
+      isRent, sortBy, city, propertyType, 
+      minPrice, maxPrice, minYear, maxYear, furnished,
+      userId // ✅ New filter to exclude properties by userId
+    } = req.body;
+
+    const properties = await propertyService.getPropertiesDynamic(
+      isRent, sortBy, city, propertyType, 
+      minPrice, maxPrice, minYear, maxYear, furnished,
+      userId // ✅ Pass userId to service
+    );
+
     res.status(200).json(properties);
   } catch (error) {
     res.status(400).json({ message: 'Error fetching properties', error: error.message });
   }
 };
 
- 
+
 // Get Non-Approved Properties
 exports.getNonApprovedProperties = async (req, res) => {
   try {

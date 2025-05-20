@@ -1,6 +1,43 @@
+/**
+ * userController.js
+ *
+ * This controller handles user-related operations in the real estate web application.
+ * It delegates business logic to the userService and ensures proper request validation,
+ * response formatting, and error handling.
+ *
+ * Features:
+ * - User authentication (login) with JWT token generation
+ * - User registration
+ * - Retrieve user by ID
+ * - Update user information
+ * - Delete user account
+ *
+ * Middleware:
+ * - Uses express-validator to validate incoming request bodies and parameters
+ *
+ * External Services:
+ * - JSON Web Token (JWT) for secure authentication
+ * - Resend (commented/unused here) for potential email notifications (e.g., verification or password recovery)
+ *
+ * Routes Handled:
+ * - POST /api/users/login → authenticateUser
+ * - POST /api/users/register → registerUser
+ * - GET /api/users/:userId → getUserById
+ * - PUT /api/users/:userId → updateUser
+ * - DELETE /api/users/:userId → deleteUser
+ *
+ * Notes:
+ * - Password hashing and verification are assumed to be handled in userService.
+ * - JWT secret key and expiration are configured via environment variables.
+ * - Validation must be set in route definitions for `validationResult` to catch errors.
+ */
+
+
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const userService = require('../services/userService'); // Import userService
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Authenticate User (Login)
 exports.authenticateUser = async (req, res) => {
@@ -14,12 +51,12 @@ exports.authenticateUser = async (req, res) => {
     const user = await userService.authenticateUser(email, password); // Delegate to service
 
     // Generate a JWT token
-    console.log( process.env.JWT_SECRET)
-    const token = jwt.sign({ userId: user.user_id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.user_id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '2h' });
 
     res.status(200).json({
       message: 'Authentication successful',
       token: token, // Send the token to the client
+      user: user     // Return the user object
     });
   } catch (error) {
     res.status(401).json({ message: 'Authentication failed', error: error.message });
@@ -34,10 +71,9 @@ exports.registerUser = async (req, res) => {
   }
 
   try {
-    console.log('user Request Body:', req.body);
-   
     const { first_name, last_name, email, password, phone_number } = req.body;
     const user = await userService.registerUser(first_name, last_name, email, password, phone_number);
+
     res.status(201).json({ message: 'User created successfully', user });
   } catch (error) {
     res.status(400).json({ message: 'User creation failed', error: error.message });

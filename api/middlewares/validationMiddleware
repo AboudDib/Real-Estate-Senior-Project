@@ -1,3 +1,21 @@
+/**
+ * validate.js
+ * 
+ * Middleware to handle validation errors from express-validator.
+ * 
+ * It checks the validation results from the request, and if any validation errors
+ * are found, it logs them to the console and sends a 400 Bad Request response
+ * containing the detailed validation error messages.
+ * 
+ * If no validation errors are found, it calls next() to continue to the next middleware or controller.
+ * 
+ * Usage:
+ * Place this middleware after your validation chain in routes to automatically handle any errors.
+ * 
+ * Example:
+ * router.post('/create', validationChain, validate, controllerFunction);
+ */
+
 const { validationResult } = require('express-validator');
 
 // Middleware for handling validation errors

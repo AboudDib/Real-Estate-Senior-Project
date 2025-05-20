@@ -1,6 +1,5 @@
 const { body, param } = require('express-validator');
 
-// Validator for creating a property
 exports.validateCreateProperty = [
   body('name')
     .notEmpty().withMessage('Name is required')
@@ -26,7 +25,6 @@ exports.validateCreateProperty = [
     .notEmpty().withMessage('User ID is required')
     .isInt().withMessage('User ID must be an integer'),
 
-  // Conditional validation for house properties
   body('square_meter')
     .if(body('property_type').equals('house'))
     .notEmpty().withMessage('Square meter is required for house properties')
@@ -35,8 +33,17 @@ exports.validateCreateProperty = [
   body('isForRent')
     .if(body('property_type').equals('house'))
     .isBoolean().withMessage('For Rent flag must be a boolean')
-    .optional(), // Allows isForRent to be optional, but it must be boolean if provided
+    .optional(), // Optional, only required for houses
+
+  body('year_built') // ✅ Required
+    .notEmpty().withMessage('Year built is required')
+    .isInt({ min: 1800, max: new Date().getFullYear() }).withMessage('Year built must be a valid year'),
+
+  body('furnished') // ✅ Required
+    .notEmpty().withMessage('Furnished is required')
+    .isBoolean().withMessage('Furnished must be a boolean'),
 ];
+
 
 // Validator for getting a property by ID
 exports.validateGetPropertyById = [
@@ -75,7 +82,6 @@ exports.validateUpdateProperty = [
     .optional()
     .isInt().withMessage('User ID must be an integer'),
 
-  // Conditional validation for house properties
   body('square_meter')
     .if(body('property_type').equals('house'))
     .notEmpty().withMessage('Square meter is required for house properties')
@@ -85,6 +91,14 @@ exports.validateUpdateProperty = [
     .if(body('property_type').equals('house'))
     .isBoolean().withMessage('For Rent flag must be a boolean')
     .optional(),
+
+    body('year_built') // ✅ Required
+    .notEmpty().withMessage('Year built is required')
+    .isInt({ min: 1800, max: new Date().getFullYear() }).withMessage('Year built must be a valid year'),
+
+  body('furnished') // ✅ Required
+    .notEmpty().withMessage('Furnished is required')
+    .isBoolean().withMessage('Furnished must be a boolean'),
 ];
 
 // Validator for deleting a property
@@ -102,15 +116,17 @@ exports.validateGetPropertiesByLocation = [
     .isLength({ min: 3 }).withMessage('City must be at least 3 characters long'),
 ];
 
-// Validator for getting properties dynamically (sorting, filtering by city, property type)
+const currentYear = new Date().getFullYear(); // Get the current year
+
+// Validator for getting properties dynamically (sorting, filtering by city, property type, and price range)
 exports.validateGetPropertiesDynamic = [
   body('isRent')
     .isBoolean().withMessage('isRent should be a boolean value')
     .optional({ checkFalsy: true }),
 
   body('sortBy')
-    .isIn(['price_asc', 'price_desc', 'date_asc', 'date_desc'])
-    .withMessage('sortBy must be one of price_asc, price_desc, date_asc, or date_desc')
+    .isIn(['price_asc', 'price_desc', 'date_asc', 'date_desc', 'year_asc', 'year_desc']) // Added year sorting
+    .withMessage('sortBy must be one of price_asc, price_desc, date_asc, date_desc, year_asc, or year_desc')
     .optional({ checkFalsy: true }),
 
   body('city')
@@ -123,4 +139,34 @@ exports.validateGetPropertiesDynamic = [
     .optional()
     .isIn(['villa', 'apartment'])
     .withMessage('propertyType must be one of Villa or Apartment'),
+
+  body('minPrice')
+    .optional()
+    .isNumeric().withMessage('minPrice must be a numeric value')
+    .custom((value, { req }) => value <= req.body.maxPrice || !req.body.maxPrice)
+    .withMessage('minPrice cannot be greater than maxPrice'),
+
+  body('maxPrice')
+    .optional()
+    .isNumeric().withMessage('maxPrice must be a numeric value')
+    .custom((value, { req }) => value >= req.body.minPrice || !req.body.minPrice)
+    .withMessage('maxPrice cannot be less than minPrice'),
+
+  body('furnished') // ✅ Added
+    .optional()
+    .isBoolean().withMessage('Furnished must be a boolean'),
+
+  body('minYearBuilt') // ✅ Added
+    .optional()
+    .isInt({ min: 1800, max: currentYear }).withMessage(`minYearBuilt must be between 1800 and the current year (${currentYear})`),
+
+  body('maxYearBuilt') // ✅ Added
+    .optional()
+    .isInt({ min: 1900, max: currentYear }).withMessage(`maxYearBuilt must be between 1800 and the current year (${currentYear})`)
+    .custom((value, { req }) => !req.body.minYearBuilt || value >= req.body.minYearBuilt)
+    .withMessage('maxYearBuilt must be greater than or equal to minYearBuilt'),
+    
+    body('userId') // ✅ New userId validation
+    .optional()
+    .isInt({ min: 1 }).withMessage('userId must be a positive integer'),
 ];

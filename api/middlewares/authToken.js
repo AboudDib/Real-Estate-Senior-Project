@@ -1,3 +1,28 @@
+/**
+ * authenticateToken.js
+ *
+ * This middleware function is used to protect routes by verifying JWT tokens passed in the Authorization header.
+ * It ensures that only authenticated users with a valid token can access the protected endpoints.
+ *
+ * How it works:
+ * 1. It checks the `Authorization` header for a Bearer token.
+ * 2. If the token is present, it attempts to verify it using the secret key defined in your `.env` file (JWT_SECRET).
+ * 3. If verification succeeds, it attaches the decoded user information (e.g. userId, email) to `req.user`.
+ * 4. If verification fails or if no token is provided, it returns a `401 Unauthorized` or `403 Forbidden` response.
+ *
+ * Usage:
+ * Include this middleware in any route that requires user authentication.
+ *
+ * Example:
+ * const authenticateToken = require('./middleware/authenticateToken');
+ * router.get('/protected', authenticateToken, (req, res) => {
+ *   res.json({ message: 'This is a protected route', user: req.user });
+ * });
+ *
+ * Expected Header Format:
+ * Authorization: Bearer <token>
+ */
+
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 

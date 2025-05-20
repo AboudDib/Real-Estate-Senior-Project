@@ -1,3 +1,21 @@
+/**
+ * userService.js
+ * 
+ * Service layer for user-related database operations.
+ * 
+ * Provides functions to:
+ * - Authenticate user credentials (login) with bcrypt password comparison.
+ * - Register new users after checking for existing email or phone number, hashing passwords securely.
+ * - Update existing users with optional fields and password hashing if changed.
+ * - Delete users by their ID.
+ * - Retrieve users by ID.
+ * 
+ * Each function throws errors for invalid credentials or missing users.
+ * 
+ * Usage:
+ * Import and call these service functions from controllers to keep authentication and user logic separate.
+ */
+
 const { User } = require('../models/user');
 const { Op } = require("sequelize");
 const bcrypt = require('bcryptjs');
@@ -20,19 +38,19 @@ exports.authenticateUser = async (email, password) => {
 // Register User
 exports.registerUser = async (first_name, last_name, email, password, phone_number) => {
   // Check if user already exists by email or phone number
-  const existingUser = await User.findOne({ 
-      where: { 
-          [Op.or]: [{ email }, { phone_number }] 
-      } 
+  const existingUser = await User.findOne({
+    where: {
+      [Op.or]: [{ email }, { phone_number }]
+    }
   });
 
   if (existingUser) {
-      if (existingUser.email === email) {
-          throw new Error('User with this email already exists');
-      }
-      if (existingUser.phone_number === phone_number) {
-          throw new Error('User with this phone number already exists');
-      }
+    if (existingUser.email === email) {
+      throw new Error('User with this email already exists');
+    }
+    if (existingUser.phone_number === phone_number) {
+      throw new Error('User with this phone number already exists');
+    }
   }
 
   // Hash password
@@ -41,16 +59,15 @@ exports.registerUser = async (first_name, last_name, email, password, phone_numb
 
   // Create new user
   const user = await User.create({
-      first_name,
-      last_name,
-      email,
-      password: hashedPassword,
-      phone_number,
+    first_name,
+    last_name,
+    email,
+    password: hashedPassword,
+    phone_number,
   });
 
   return user;
 };
-
 
 // Update User
 exports.updateUser = async (userId, first_name, last_name, email, password, phone_number) => {
@@ -59,14 +76,14 @@ exports.updateUser = async (userId, first_name, last_name, email, password, phon
     throw new Error('User not found');
   }
 
-  if (first_name) user.first_name = first_name;   // Correct attribute: first_name
-  if (last_name) user.last_name = last_name;       // Correct attribute: last_name
-  if (email) user.email = email;                   // Correct attribute: email
+  if (first_name) user.first_name = first_name;
+  if (last_name) user.last_name = last_name;
+  if (email) user.email = email;
   if (password) {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
   }
-  if (phone_number) user.phone_number = phone_number; // Correct attribute: phone_number
+  if (phone_number) user.phone_number = phone_number;
 
   await user.save(); // Save updated user
   return user; // Return the updated user
@@ -91,3 +108,5 @@ exports.getUserById = async (userId) => {
 
   return user; // Return the user found by ID
 };
+
+// Verify User (removed since isVerified is no longer used

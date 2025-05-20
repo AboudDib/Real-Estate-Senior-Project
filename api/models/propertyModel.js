@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/dbconfig');
-const { Property } = require("./property");  // Destructure to access Property model
+const { Property } = require("./property");
 
 const PropertyModel = db.define('PropertyModel', {
   model_id: {
@@ -21,12 +21,8 @@ const PropertyModel = db.define('PropertyModel', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  format: {
-    type: DataTypes.ENUM('glb', 'gltf', 'obj', 'fbx'),
-    allowNull: false,
-  },
 });
-PropertyModel.belongsTo(Property, { foreignKey: 'property_id' , onDelete: 'CASCADE' });
+
+PropertyModel.belongsTo(Property, { foreignKey: 'property_id', onDelete: 'CASCADE' });
 
 module.exports = { PropertyModel };
-

@@ -81,6 +81,20 @@ const Property = sequelize.define("Property", {
       min: 0,
     },
   },
+  furnished: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false, // Assume unfurnished unless specified
+  },
+  year_built: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    validate: {
+      min: 1800, // Just to be safe from weird data
+      max: new Date().getFullYear(),
+    },
+  },
+  
   isForRent: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
