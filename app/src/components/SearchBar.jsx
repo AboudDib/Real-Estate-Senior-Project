@@ -1,3 +1,23 @@
+/**
+ * SearchBar Component
+ * 
+ * A responsive search input component with a stylish design using Material UI and Lucide icons.
+ * It allows users to type a city name and trigger a search using either the enter key or the search button.
+ * 
+ * Features:
+ * - Controlled input (`localQuery`) for smooth UX and form isolation
+ * - Two search icons: one static and one clickable for submission
+ * - Responsive styling and hover effects for improved user interaction
+ * 
+ * Props:
+ * - searchQuery (string): The current global search term from parent
+ * - setSearchQuery (function): Callback to update the parent with the new query
+ * 
+ * Usage:
+ * <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+ * 
+ */
+
 import React, { useState } from 'react';
 import { Paper, InputBase, IconButton, Box } from '@mui/material';
 import { Search } from 'lucide-react';

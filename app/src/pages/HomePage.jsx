@@ -1,3 +1,44 @@
+/*
+  HomePage Component:
+
+  - Imports React, Material UI components, and routing/linking utilities.
+  - Imports custom AboutUsSection component and imageLinks asset collection.
+
+  Functionality:
+  - Defines an array `cardsData` containing information for three cards (Buy a home, Sell a home, Rent a home), each with an image, title, and description.
+  
+  Layout:
+  1. Hero Section:
+    - Full viewport height with a background image from `imageLinks.HomeBckg`.
+    - Transparent AppBar positioned absolutely at the top, containing:
+      - Logo image aligned left.
+      - Navigation buttons on the right:
+        * "About us" button that smoothly scrolls down to the About Us section.
+        * "Contact Us" button linking to a WhatsApp chat.
+        * A label showing "🇱🇧 Lebanon".
+    - Centered hero content includes:
+      * Main heading "The Future of Real Estate".
+      * Subheading describing the platform’s purpose.
+      * Buttons for "Login" and "Signup" linking to respective routes, styled responsively.
+
+  2. About Us Section:
+    - Placed below the hero section with minimum full viewport height.
+    - White background with centered text content.
+    - Title "About Us" with bold styling.
+    - A descriptive paragraph about the mission.
+    - Renders the `AboutUsSection` component with the `cardsData` passed as props to display feature cards.
+
+  Styling:
+  - Uses Material UI’s `sx` prop for responsive and consistent styling.
+  - Buttons and typography adjust font sizes and layouts based on screen size.
+  - Navigation bar is transparent to blend with the hero background.
+
+  Overall:
+  - A clean, modern landing page for a real estate platform.
+  - Focus on intuitive navigation with smooth scrolling and external contact.
+  - Responsive design with clear call-to-actions for login/signup.
+*/
+
 import React from "react";
 import {
   AppBar,
@@ -32,12 +73,7 @@ const HomePage = () => {
       description:
         "We’re creating a seamless online experience – from shopping on the largest rental network, to applying, to paying rent.",
     },
-    {
-      image: imageLinks.SellLand, // New image link for the land
-      title: "Sell land",
-      description:
-        "We help you sell your land quickly and efficiently, reaching a broad network of potential buyers.",
-    },
+    
   ];
 
   return (

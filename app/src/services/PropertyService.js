@@ -1,3 +1,31 @@
+/**
+ * PropertyService
+ * ---------------
+ * This service provides API interactions related to property management.
+ * It covers creating, updating, deleting, retrieving, and approving properties,
+ * as well as filtering properties based on various criteria.
+ * 
+ * All requests that require authorization include a JWT token from localStorage.
+ * Errors are centrally handled via the handleApiError utility.
+ * 
+ * Methods:
+ *  - createProperty(propertyData): Creates a new property with the given data.
+ *  - updateProperty(propertyId, propertyData): Updates an existing property by ID.
+ *  - deleteProperty(propertyId): Deletes a property by its ID.
+ *  - getPropertyById(propertyId): Fetches detailed information for a property by ID.
+ *  - getPropertiesByUserId(userId): Retrieves all properties posted by a specific user.
+ *  - getApprovedProperties(): Retrieves all properties approved for listing.
+ *  - getNonApprovedProperties(): Retrieves properties pending approval.
+ *  - approveProperty(propertyId, user_id): Approves a property and associates the approving user.
+ *  - getPropertiesByType(propertyType): Fetches properties filtered by type (e.g., apartment, villa).
+ *  - getPropertiesByLocation(propertyType, city): Fetches properties filtered by type and city.
+ *  - getPropertiesDynamic(filters): Retrieves properties based on multiple dynamic filters 
+ *      such as rent status, sorting, city, type, price range, year range, furnished status, and user ID.
+ * 
+ * Usage:
+ * Import this service to perform CRUD and filtering operations on properties in the backend.
+ */
+
 import http from "../http-common";
 import handleApiError from "../utils/apiErrorHandler";  // Reusable error handler
 
@@ -15,11 +43,17 @@ const createProperty = async (propertyData) => {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    // Log the response to see the full details
+    console.log("Property created, response:", response);
+
     return response;
   } catch (error) {
+    console.error("Error in property creation:", error); // Log any errors
     return handleApiError(error);
   }
 };
+
 
 // Update Property
 const updateProperty = async (propertyId, propertyData) => {
@@ -112,19 +146,25 @@ const getNonApprovedProperties = async () => {
 };
 
 // Approve Property
-const approveProperty = async (propertyId) => {
+const approveProperty = async (propertyId, user_id) => {
   try {
     const token = getToken();
-    const response = await http.put(`/property/approve/${propertyId}`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    console.log(user_id)
+    const response = await http.put(
+      `/property/approve/${propertyId}`,
+      { user_id },  // Send userId in the request body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response;
   } catch (error) {
     return handleApiError(error);
   }
 };
+
 
 // Get Properties by Type (apartments, villas)
 const getPropertiesByType = async (propertyType) => {
@@ -157,7 +197,11 @@ const getPropertiesByLocation = async (propertyType, city) => {
   }
 };
 
-const getPropertiesDynamic = async ({ isRent, sortBy, city, propertyType }) => {
+const getPropertiesDynamic = async ({ 
+  isRent, sortBy, city, propertyType, 
+  minPrice, maxPrice, minYear, maxYear, 
+  furnished, userId 
+}) => {
   try {
     const token = getToken();
     console.log("Token:", token);  // Debugging token
@@ -167,17 +211,24 @@ const getPropertiesDynamic = async ({ isRent, sortBy, city, propertyType }) => {
       sortBy,
       city,
       propertyType,
+      minPrice,
+      maxPrice,
+      minYear,
+      maxYear,
+      furnished,
+      userId,
     }, {
       headers: {
-        Authorization: `Bearer ${token}`, // Pass the token in headers
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    return response.data;  // Return only the data part of the response
+    return response.data;
   } catch (error) {
     return handleApiError(error);
   }
 };
+
 
 
 // Export the service methods

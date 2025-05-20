@@ -1,8 +1,49 @@
+/*
+  RealEstateSignupPage Component
+
+  This React functional component renders a user signup form for a real estate web application.
+  It uses Material-UI components for layout and styling, and React Router for navigation.
+
+  Features and behaviors:
+  - Form fields: First Name, Last Name, Email, Phone Number, Password.
+  - Password input includes a toggle to show/hide the password.
+  - Client-side validation before submitting:
+    * First and last names must not be empty.
+    * Email must match a simple regex pattern.
+    * Phone number must be exactly 8 digits.
+    * Password must be at least 6 characters long.
+  - Displays validation error messages under each relevant field.
+  - Shows a general error alert if the server returns an error (e.g., user already exists).
+  - On successful signup (HTTP 201 response):
+    * Displays a success message with a green check icon.
+    * Stores user data and authentication token in localStorage.
+    * Redirects the user to the login page after a short delay.
+  - Uses a loading spinner inside the submit button while waiting for the API response.
+  - Background image and centered layout create an attractive, responsive signup page.
+  - Navigation link to the login page for existing users.
+
+  External dependencies:
+  - UserService.register(): API call to register a new user.
+  - react-router-dom's useNavigate for programmatic navigation.
+  - imageLinks.HomeBckg for background image URL.
+
+  Component state:
+  - formData: Object holding all form input values.
+  - showPassword: Boolean toggle for password visibility.
+  - error: Object storing validation errors and general API errors.
+  - loading: Boolean to show loading spinner during API call.
+  - success: Boolean to display a success message on successful registration.
+
+  Overall, this component provides a user-friendly, validated signup form 
+  with clear feedback and smooth navigation flow.
+*/
+
 import React, { useState } from 'react';
 import { Box, Grid, TextField, Button, Typography, IconButton, InputAdornment, Paper, CircularProgress, Alert } from '@mui/material';
 import { Visibility, VisibilityOff, CheckCircle } from '@mui/icons-material';
 import UserService from "../services/UserService.js";
 import { Link, useNavigate } from 'react-router-dom';
+import imageLinks from '../assets/ImageLinks.js';
 
 const RealEstateSignupPage = () => {
     const [formData, setFormData] = useState({
@@ -82,7 +123,7 @@ const RealEstateSignupPage = () => {
                 setSuccess(true); // Show success message
                 localStorage.setItem("user", JSON.stringify(result.data.user));
                 localStorage.setItem("token", result.data.token);
-                setTimeout(() => navigate("/Dashboard"), 2000);
+                setTimeout(() => navigate("/Login"), 2000);
             } else {
                 // Error handling, if user already exists or other errors
                 const errorMessage = result?.data?.error || "Something went wrong";
@@ -100,7 +141,8 @@ const RealEstateSignupPage = () => {
             sx={{
                 height: '100vh',
                 width: '100vw',
-                backgroundImage: 'url("https://your-real-estate-background-image-url.com")',
+                backgroundImage: `url(${imageLinks.HomeBckg})`,
+
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: 'cover',

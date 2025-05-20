@@ -1,8 +1,31 @@
+/**
+ * RealEstateLoginPage Component
+ * 
+ * This component renders the login page for the Real Estate web app.
+ * 
+ * Features:
+ * - Email and password input fields with client-side validation to ensure fields are not empty.
+ * - Password visibility toggle functionality to show/hide password text.
+ * - Login button that triggers authentication via UserService.
+ * - Displays error alerts for various authentication failures (e.g., invalid credentials, server errors).
+ * - Stores authenticated user data and token in localStorage upon successful login.
+ * - Redirects users to either the dashboard or admin panel based on their user role.
+ * - Uses Material UI components for styling and responsive layout.
+ * - Background image and styled login card for visual appeal.
+ * 
+ * Notes:
+ * - Uses React Router's useNavigate hook for programmatic navigation after login.
+ * - Maintains local component state for form inputs and UI feedback.
+ * - Handles asynchronous login operation with proper error catching.
+ * - Password visibility toggle uses MUI IconButton with Visibility and VisibilityOff icons.
+ */
+
 import React, { useState } from 'react';
 import { Box, Grid, TextField, Button, Typography, Alert, IconButton, InputAdornment, Paper } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import UserService from "../services/UserService.js";
 import { Link, useNavigate } from 'react-router-dom';
+import imageLinks from '../assets/ImageLinks.js';
 
 const RealEstateLoginPage = () => {
     const [email, setEmail] = useState('');
@@ -23,22 +46,28 @@ const RealEstateLoginPage = () => {
         try {
             // Attempt to authenticate with the provided credentials
             const result = await UserService.authenticate({ email, password });
-            
+
             if (result?.status === 200) {
-                localStorage.setItem("user", JSON.stringify(result.data.user));
+                const user = result.data.user;
+
+              
                 localStorage.setItem("token", result.data.token);
-                navigate("/Dashboard");
+                console.log(result)
+                if (user.isAdmin) {
+                      localStorage.setItem("admin", JSON.stringify(user));
+                    navigate("/adminpanel");
+                } else {
+                      localStorage.setItem("user", JSON.stringify(user));
+                    navigate("/Dashboard");
+                }
             } else {
-                // Handle the case where the backend returns an error (e.g., wrong credentials)
                 setError(result?.data?.message || "Wrong username/password");
                 setEmail('');
                 setPassword('');
             }
         } catch (error) {
-            // Handle network errors or other unexpected issues
             console.error('Login error:', error);
 
-            // Display an error message based on the type of error
             if (error.response && error.response.status === 400) {
                 setError("Invalid username or password. Please try again.");
             } else if (error.response && error.response.status === 500) {
@@ -58,7 +87,8 @@ const RealEstateLoginPage = () => {
             sx={{
                 height: '100vh',
                 width: '100vw',
-                backgroundImage: 'url("https://your-real-estate-background-image-url.com")',
+                backgroundImage: `url(${imageLinks.HomeBckg})`,
+
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: 'cover',
